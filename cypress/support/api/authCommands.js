@@ -1,9 +1,9 @@
 // COMANDO CUSTOMIZADO PARA REALIZAR O LOGIN VIA API
 Cypress.Commands.add('realizaLoginAPI', (email = Cypress.env('email'), paswoord = Cypress.env('password')) => {
 
-    cy.request({
+    cy.api({
         method: 'POST',
-        url: `https://serverest.dev/login`,
+        url: '/login',
         failOnStatusCode: false,
         body: {
             "email": email,
