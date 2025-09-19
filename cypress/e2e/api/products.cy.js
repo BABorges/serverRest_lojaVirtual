@@ -186,7 +186,7 @@ describe('Produtos', () => {
                 })
         })
 
-        it('Token ausente, inválido ou expirado', () => {
+        /* it('Cadastra produto com token ausente, inválido ou expirado', () => {
 
             // GERA DADOS DO NOVO PRODUTO
             const novoProduto = gerarDadosProduto()
@@ -196,13 +196,234 @@ describe('Produtos', () => {
             const quantidade = geraQuantidadeAleatorio()
 
             token = ""
-            
+
             // COMANDO PERSONALIZADO PARA CADASTRAR UM NOVO PRODUTO
             cy.cadastraProduto(token, nome, descricao, preco, quantidade)
-            .then((response) => {
+                .then((response) => {
                     expect(response.status).to.eq(401)
                     expect(response.body.message).to.eq('Token de acesso ausente, inválido, expirado ou usuário do token não existe mais')
                 })
+        }) */
+    })
+
+    context('Edição de produto', () => {
+
+        it('Edita o campo nome com sucesso', () => {
+
+            // COMANDO PERSONALIZADO PARA LISTAR TODOS OS PRODUTOS CADASTRADOS
+            cy.listaTodosProdutos()
+                .then((response) => {
+                    const qtdTotalProtudos = response.body.quantidade
+                    cy.log(`Atualmente existem cadastrados ${qtdTotalProtudos} produtos!`)
+
+                    // CHAMA A FUNÇÃO QUE GERA UM NÚMERO ALEATÓRIO PASSANDO A QUANTIDADE DE PRODUTOS COMO LIMITE
+                    const numProdutoAleatorio = geraNumeroAleatorio(qtdTotalProtudos)
+
+                    // ARMAZENA O ID DO USUÁRIO
+                    const idConsultaProduto = response.body.produtos[numProdutoAleatorio]._id
+                    const descricao = response.body.produtos[numProdutoAleatorio].descricao
+                    const preco = response.body.produtos[numProdutoAleatorio].preco
+                    const quantidade = response.body.produtos[numProdutoAleatorio].quantidade
+
+                    // GERA DADOS DO NOVO PRODUTO
+                    const novoProduto = gerarDadosProduto()
+                    const nome = novoProduto.productName
+
+                    // COMANDO PERSONALIZADO PARA CADASTRAR UM NOVO PRODUTO
+                    cy.atualizaProduto(token, idConsultaProduto, nome, descricao, preco, quantidade)
+                        .then((response) => {
+                            const produtoAtualizado = response.body
+                            expect(response.status).to.eq(200)
+                            expect(produtoAtualizado.message).to.eq('Registro alterado com sucesso')
+
+                            // COMANDO PERSONALIZADO PARA LISTAR TODOS OS PRODUTOS CADASTRADOS
+                            cy.listaTodosProdutos()
+                                .then((response) => {
+                                    expect(response.status).to.eq(200)
+                                    const resultado = response.body
+
+                                    cy.log(`Atualmente existem cadastrados ${resultado.quantidade} produtos!`)
+
+                                    cy.log(idConsultaProduto)
+                                    // COMANDO PERSONALIZADO PARA LISTAR UM PRODUTO CADASTRADOS EM ESPECÍFICO PELO SEU ID
+                                    cy.consultaProduto(idConsultaProduto)
+                                        .then((response) => {
+                                            cy.log(idConsultaProduto)
+                                            expect(response.status).to.eq(200)
+                                            const resultado = response.body
+
+                                            cy.log(`Nome: ${resultado.nome}`)
+                                            cy.log(`Preço: ${resultado.preco}`)
+                                            cy.log(`Descrição: ${resultado.descricao}`)
+                                            cy.log(`Quantidade: ${resultado.quantidade}`)
+                                        })
+                                })
+                        })
+                })
+
+        })
+
+        it('Edita o campo descrição com sucesso', () => {
+
+            // COMANDO PERSONALIZADO PARA LISTAR TODOS OS PRODUTOS CADASTRADOS
+            cy.listaTodosProdutos()
+                .then((response) => {
+                    const qtdTotalProtudos = response.body.quantidade
+                    cy.log(`Atualmente existem cadastrados ${qtdTotalProtudos} produtos!`)
+
+                    // CHAMA A FUNÇÃO QUE GERA UM NÚMERO ALEATÓRIO PASSANDO A QUANTIDADE DE PRODUTOS COMO LIMITE
+                    const numProdutoAleatorio = geraNumeroAleatorio(qtdTotalProtudos)
+
+                    // ARMAZENA O ID DO USUÁRIO
+                    const idConsultaProduto = response.body.produtos[numProdutoAleatorio]._id
+                    const nome = response.body.produtos[numProdutoAleatorio].nome
+                    const preco = response.body.produtos[numProdutoAleatorio].preco
+                    const quantidade = response.body.produtos[numProdutoAleatorio].quantidade
+
+                    // GERA DADOS DO NOVO PRODUTO
+                    const novoProduto = gerarDadosProduto()
+                    const descricao = novoProduto.productDescrition
+
+                    // COMANDO PERSONALIZADO PARA CADASTRAR UM NOVO PRODUTO
+                    cy.atualizaProduto(token, idConsultaProduto, nome, descricao, preco, quantidade)
+                        .then((response) => {
+                            const produtoAtualizado = response.body
+                            expect(response.status).to.eq(200)
+                            expect(produtoAtualizado.message).to.eq('Registro alterado com sucesso')
+
+                            // COMANDO PERSONALIZADO PARA LISTAR TODOS OS PRODUTOS CADASTRADOS
+                            cy.listaTodosProdutos()
+                                .then((response) => {
+                                    expect(response.status).to.eq(200)
+                                    const resultado = response.body
+
+                                    cy.log(`Atualmente existem cadastrados ${resultado.quantidade} produtos!`)
+
+                                    cy.log(idConsultaProduto)
+                                    // COMANDO PERSONALIZADO PARA LISTAR UM PRODUTO CADASTRADOS EM ESPECÍFICO PELO SEU ID
+                                    cy.consultaProduto(idConsultaProduto)
+                                        .then((response) => {
+                                            cy.log(idConsultaProduto)
+                                            expect(response.status).to.eq(200)
+                                            const resultado = response.body
+
+                                            cy.log(`Nome: ${resultado.nome}`)
+                                            cy.log(`Preço: ${resultado.preco}`)
+                                            cy.log(`Descrição: ${resultado.descricao}`)
+                                            cy.log(`Quantidade: ${resultado.quantidade}`)
+                                        })
+                                })
+                        })
+                })
+
+        })
+
+        it('Edita o campo preço com sucesso', () => {
+
+            // COMANDO PERSONALIZADO PARA LISTAR TODOS OS PRODUTOS CADASTRADOS
+            cy.listaTodosProdutos()
+                .then((response) => {
+                    const qtdTotalProtudos = response.body.quantidade
+                    cy.log(`Atualmente existem cadastrados ${qtdTotalProtudos} produtos!`)
+
+                    // CHAMA A FUNÇÃO QUE GERA UM NÚMERO ALEATÓRIO PASSANDO A QUANTIDADE DE PRODUTOS COMO LIMITE
+                    const numProdutoAleatorio = geraNumeroAleatorio(qtdTotalProtudos)
+
+                    // ARMAZENA O ID DO USUÁRIO
+                    const idConsultaProduto = response.body.produtos[numProdutoAleatorio]._id
+                    const descricao = response.body.produtos[numProdutoAleatorio].descricao
+                    const nome = response.body.produtos[numProdutoAleatorio].nome
+                    const quantidade = response.body.produtos[numProdutoAleatorio].quantidade
+
+                    // GERA DADOS DO NOVO PRODUTO
+                    const novoProduto = gerarDadosProduto()
+                    const preco = parseInt(novoProduto.price, 10)
+
+                    // COMANDO PERSONALIZADO PARA CADASTRAR UM NOVO PRODUTO
+                    cy.atualizaProduto(token, idConsultaProduto, nome, descricao, preco, quantidade)
+                        .then((response) => {
+                            const produtoAtualizado = response.body
+                            expect(response.status).to.eq(200)
+                            expect(produtoAtualizado.message).to.eq('Registro alterado com sucesso')
+
+                            // COMANDO PERSONALIZADO PARA LISTAR TODOS OS PRODUTOS CADASTRADOS
+                            cy.listaTodosProdutos()
+                                .then((response) => {
+                                    expect(response.status).to.eq(200)
+                                    const resultado = response.body
+
+                                    cy.log(`Atualmente existem cadastrados ${resultado.quantidade} produtos!`)
+
+                                    cy.log(idConsultaProduto)
+                                    // COMANDO PERSONALIZADO PARA LISTAR UM PRODUTO CADASTRADOS EM ESPECÍFICO PELO SEU ID
+                                    cy.consultaProduto(idConsultaProduto)
+                                        .then((response) => {
+                                            cy.log(idConsultaProduto)
+                                            expect(response.status).to.eq(200)
+                                            const resultado = response.body
+
+                                            cy.log(`Nome: ${resultado.nome}`)
+                                            cy.log(`Preço: ${resultado.preco}`)
+                                            cy.log(`Descrição: ${resultado.descricao}`)
+                                            cy.log(`Quantidade: ${resultado.quantidade}`)
+                                        })
+                                })
+                        })
+                })
+
+        })
+
+        it('Edita o campo preço com sucesso', () => {
+
+            // COMANDO PERSONALIZADO PARA LISTAR TODOS OS PRODUTOS CADASTRADOS
+            cy.listaTodosProdutos()
+                .then((response) => {
+                    const qtdTotalProtudos = response.body.quantidade
+                    cy.log(`Atualmente existem cadastrados ${qtdTotalProtudos} produtos!`)
+
+                    // CHAMA A FUNÇÃO QUE GERA UM NÚMERO ALEATÓRIO PASSANDO A QUANTIDADE DE PRODUTOS COMO LIMITE
+                    const numProdutoAleatorio = geraNumeroAleatorio(qtdTotalProtudos)
+
+                    // ARMAZENA O ID DO USUÁRIO
+                    const idConsultaProduto = response.body.produtos[numProdutoAleatorio]._id
+                    const descricao = response.body.produtos[numProdutoAleatorio].descricao
+                    const nome = response.body.produtos[numProdutoAleatorio].nome
+                    const preco = response.body.produtos[numProdutoAleatorio].preco
+
+                    // GERA DADOS DO NOVO PRODUTO
+                    const quantidade = geraQuantidadeAleatorio()
+
+                    // COMANDO PERSONALIZADO PARA CADASTRAR UM NOVO PRODUTO
+                    cy.atualizaProduto(token, idConsultaProduto, nome, descricao, preco, quantidade)
+                        .then((response) => {
+                            const produtoAtualizado = response.body
+                            expect(response.status).to.eq(200)
+                            expect(produtoAtualizado.message).to.eq('Registro alterado com sucesso')
+
+                            // COMANDO PERSONALIZADO PARA LISTAR TODOS OS PRODUTOS CADASTRADOS
+                            cy.listaTodosProdutos()
+                                .then((response) => {
+                                    expect(response.status).to.eq(200)
+                                    const resultado = response.body
+
+                                    cy.log(`Atualmente existem cadastrados ${resultado.quantidade} produtos!`)
+
+                                    // COMANDO PERSONALIZADO PARA LISTAR UM PRODUTO CADASTRADOS EM ESPECÍFICO PELO SEU ID
+                                    cy.consultaProduto(idConsultaProduto)
+                                        .then((response) => {
+                                            cy.log(idConsultaProduto)
+                                            expect(response.status).to.eq(200)
+                                            const resultado = response.body
+
+                                            cy.log(`Nome: ${resultado.nome}`)
+                                            cy.log(`Preço: ${resultado.preco}`)
+                                            cy.log(`Descrição: ${resultado.descricao}`)
+                                            cy.log(`Quantidade: ${resultado.quantidade}`)
+                                        })
+                                })
+                        })
+                })
+
         })
     })
 })

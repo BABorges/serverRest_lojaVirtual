@@ -36,3 +36,22 @@ Cypress.Commands.add('cadastraProduto', (token, nome, descricao, preco, quantida
         }
     })
 })
+
+// COMANDO PERSONALIZADO PARA ATUALIZAR UM PRODUTO
+Cypress.Commands.add('atualizaProduto', (token, idConsultaProduto, nome, descricao, preco, quantidade) => {
+
+    cy.api({
+        method: 'PUT',
+        url: `/produtos/${idConsultaProduto}`,
+        failOnStatusCode: false,
+        headers: {
+            "Authorization": token
+        },
+        body: {
+            "nome": nome,
+            "preco": preco,
+            "descricao": descricao,
+            "quantidade": quantidade
+        }
+    })
+})

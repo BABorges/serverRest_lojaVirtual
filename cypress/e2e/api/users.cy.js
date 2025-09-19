@@ -295,7 +295,7 @@ describe('Usuários', () => {
         })
     })
 
-    context('edição de usuário', () => {
+    context('Edição de usuário', () => {
         it('Edita o campo nome com sucesso', () => {
 
             // COMANDO PERSONALIZADO PARA LISTAR TODOS OS USUÁRIOS CADASTRADOS
@@ -802,7 +802,7 @@ describe('Usuários', () => {
 
     })
 
-    context('exclusão de usuário', () => {
+    context('Exclusão de usuário', () => {
         it('Exclui um usuário com sucesso', () => {
 
             // COMANDO PERSONALIZADO PARA LISTAR TODOS OS USUÁRIOS CADASTRADOS
