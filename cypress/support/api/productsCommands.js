@@ -55,3 +55,16 @@ Cypress.Commands.add('atualizaProduto', (token, idConsultaProduto, nome, descric
         }
     })
 })
+
+// COMANDO PERSONALIZADO PARA DELETAR UM PRODUTO
+Cypress.Commands.add('delelaProduto', (token, idConsultaProduto) => {
+
+    cy.api({
+        method: 'DELETE',
+        url: `/produtos/${idConsultaProduto}`,
+        failOnStatusCode: false,
+        headers: {
+            "Authorization": token
+        },
+    })
+})

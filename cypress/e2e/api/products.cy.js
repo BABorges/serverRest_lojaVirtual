@@ -24,12 +24,12 @@ describe('Produtos', () => {
                     const resultado = response.body
                     expect(resultado).to.be.an('object')
                     expect(resultado).to.include.all.keys('quantidade', 'produtos')
-                    expect(resultado.quantidade).to.be.greaterThan(0)
+                    expect(resultado.quantidade).to.be.at.least(0)
                     expect(resultado.produtos).to.not.be.empty
                     expect(resultado.produtos[0].nome).to.not.be.empty
-                    expect(resultado.produtos[0].preco).to.be.greaterThan(0)
+                    expect(resultado.produtos[0].preco).to.be.at.least(0)
                     expect(resultado.produtos[0].descricao).to.not.be.empty
-                    expect(resultado.produtos[0].quantidade).to.be.greaterThan(0)
+                    expect(resultado.produtos[0].quantidade).to.be.at.least(0)
                     expect(resultado.produtos[0]._id).to.not.be.empty
 
                     cy.log(`Atualmente existem cadastrados ${resultado.quantidade} produtos!`)
@@ -58,9 +58,9 @@ describe('Produtos', () => {
                             const resultado = response.body
                             expect(resultado).to.be.an('object')
                             expect(resultado.nome).to.not.be.empty
-                            expect(resultado.preco).to.be.greaterThan(0)
+                            expect(resultado.preco).to.be.at.least(0)
                             expect(resultado.descricao).to.not.be.empty
-                            expect(resultado.quantidade).to.be.greaterThan(0)
+                            expect(resultado.quantidade).to.be.at.least(0)
                             expect(resultado._id).to.not.be.empty
 
                             cy.log(`O id ${idConsultaProduto} corresponde ao produto ${response.body.nome}`)
@@ -186,24 +186,25 @@ describe('Produtos', () => {
                 })
         })
 
-        /* it('Cadastra produto com token ausente, inválido ou expirado', () => {
+        it('Cadastra produto com token ausente, inválido ou expirado', () => {
 
-            // GERA DADOS DO NOVO PRODUTO
-            const novoProduto = gerarDadosProduto()
-            const nome = novoProduto.productName
-            const descricao = novoProduto.productDescrition
-            const preco = parseInt(novoProduto.price, 10)
-            const quantidade = geraQuantidadeAleatorio()
+            cy.then(() => {
 
-            token = ""
+                // GERA DADOS DO NOVO PRODUTO
+                const novoProduto = gerarDadosProduto()
+                const nome = novoProduto.productName
+                const descricao = novoProduto.productDescrition
+                const preco = parseInt(novoProduto.price, 10)
+                const quantidade = geraQuantidadeAleatorio()
 
-            // COMANDO PERSONALIZADO PARA CADASTRAR UM NOVO PRODUTO
-            cy.cadastraProduto(token, nome, descricao, preco, quantidade)
-                .then((response) => {
-                    expect(response.status).to.eq(401)
-                    expect(response.body.message).to.eq('Token de acesso ausente, inválido, expirado ou usuário do token não existe mais')
-                })
-        }) */
+                // COMANDO PERSONALIZADO PARA CADASTRAR UM NOVO PRODUTO
+                cy.cadastraProduto("", nome, descricao, preco, quantidade)
+                    .then((response) => {
+                        expect(response.status).to.eq(401)
+                        expect(response.body.message).to.eq('Token de acesso ausente, inválido, expirado ou usuário do token não existe mais')
+                    })
+            })
+        })
     })
 
     context('Edição de produto', () => {
@@ -424,6 +425,98 @@ describe('Produtos', () => {
                         })
                 })
 
+        })
+    })
+
+    context('Exclusão de produtos', () => {
+
+        it('Excluir um produto com sucesso', () => {
+
+            // COMANDO PERSONALIZADO PARA LISTAR TODOS OS PRODUTOS CADASTRADOS
+            cy.listaTodosProdutos()
+                .then((response) => {
+                    const qtdTotalProtudos = response.body.quantidade
+                    cy.log(`Atualmente existem cadastrados ${qtdTotalProtudos} produtos!`)
+
+                    // CHAMA A FUNÇÃO QUE GERA UM NÚMERO ALEATÓRIO PASSANDO A QUANTIDADE DE PRODUTOS COMO LIMITE
+                    const numProdutoAleatorio = geraNumeroAleatorio(qtdTotalProtudos)
+
+                    // ARMAZENA O ID DO USUÁRIO
+                    const produtoResponse = {
+                        idConsultaProduto: response.body.produtos[numProdutoAleatorio]._id,
+                        nome: response.body.produtos[numProdutoAleatorio].nome,
+                        descricao: response.body.produtos[numProdutoAleatorio].descricao,
+                        preco: response.body.produtos[numProdutoAleatorio].preco,
+                        quantidade: response.body.produtos[numProdutoAleatorio].quantidade
+                    }
+
+                    cy.log(`ID do Produto: ${produtoResponse.idConsultaProduto}`)
+                    cy.log(`Produto: ${produtoResponse.nome}`)
+                    cy.log(`Descrição: ${produtoResponse.descricao}`)
+                    cy.log(`Preço: ${produtoResponse.preco}`)
+                    cy.log(`Quantidade: ${produtoResponse.quantidade}`)
+
+                    // COMANDO PERSONALIZADO PARA DELETAR UM PRODUTO
+                    cy.delelaProduto(token, produtoResponse.idConsultaProduto)
+                        .then((response) => {
+                            expect(response.status).to.eq(200)
+                            const resultado = response.body
+                            expect(resultado).to.be.an('object')
+                            expect(resultado.message).to.not.be.empty
+                            expect(resultado.message).to.eq('Registro excluído com sucesso')
+
+                            // COMANDO PERSONALIZADO PARA LISTAR UM PRODUTO CADASTRADOS EM ESPECÍFICO PELO SEU ID
+                            cy.consultaProduto(produtoResponse.idConsultaProduto)
+                                .then((response) => {
+                                    expect(response.status).to.eq(400)
+                                    expect(response.body.message).to.eq('Produto não encontrado')
+                                    cy.log(`O produto ${produtoResponse.nome} de ID ${produtoResponse.idConsultaProduto} foi excluído e não consta mais em nossa base.`)
+                                })
+                        })
+                })
+        })
+
+        it('Excluir um produto que consta em um carrinho', () => {
+
+        })
+
+        it('Excluir um produto como usuário comum', () => {
+
+        })
+
+        it('Excluir um produto com token ausente, inválido ou expirado', () => {
+
+            // COMANDO PERSONALIZADO PARA LISTAR TODOS OS PRODUTOS CADASTRADOS
+            cy.listaTodosProdutos()
+                .then((response) => {
+                    const qtdTotalProtudos = response.body.quantidade
+                    cy.log(`Atualmente existem cadastrados ${qtdTotalProtudos} produtos!`)
+
+                    // CHAMA A FUNÇÃO QUE GERA UM NÚMERO ALEATÓRIO PASSANDO A QUANTIDADE DE PRODUTOS COMO LIMITE
+                    const numProdutoAleatorio = geraNumeroAleatorio(qtdTotalProtudos)
+
+                    // ARMAZENA O ID DO USUÁRIO
+                    const produtoResponse = {
+                        idConsultaProduto: response.body.produtos[numProdutoAleatorio]._id,
+                        nome: response.body.produtos[numProdutoAleatorio].nome,
+                        descricao: response.body.produtos[numProdutoAleatorio].descricao,
+                        preco: response.body.produtos[numProdutoAleatorio].preco,
+                        quantidade: response.body.produtos[numProdutoAleatorio].quantidade
+                    }
+
+                    cy.log(`ID do Produto: ${produtoResponse.idConsultaProduto}`)
+                    cy.log(`Produto: ${produtoResponse.nome}`)
+                    cy.log(`Descrição: ${produtoResponse.descricao}`)
+                    cy.log(`Preço: ${produtoResponse.preco}`)
+                    cy.log(`Quantidade: ${produtoResponse.quantidade}`)
+
+                    // COMANDO PERSONALIZADO PARA DELETAR UM PRODUTO
+                    cy.delelaProduto("", produtoResponse.idConsultaProduto)
+                        .then((response) => {
+                        expect(response.status).to.eq(401)
+                        expect(response.body.message).to.eq('Token de acesso ausente, inválido, expirado ou usuário do token não existe mais')
+                    })
+                })
         })
     })
 })

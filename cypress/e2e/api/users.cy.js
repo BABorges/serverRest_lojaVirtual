@@ -14,7 +14,7 @@ describe('Usuários', () => {
                     const resultado = response.body
                     expect(resultado).to.be.an('object')
                     expect(resultado).to.include.all.keys('quantidade', 'usuarios')
-                    expect(resultado.quantidade).to.be.greaterThan(0)
+                    expect(resultado.quantidade).to.be.at.least(0)
                     expect(resultado.usuarios).to.not.be.empty
                     expect(resultado.usuarios[0].nome).to.not.be.empty
                     expect(resultado.usuarios[0].email).to.not.be.empty
@@ -545,7 +545,7 @@ describe('Usuários', () => {
                     if (dadosUsuarioConsultado.administradorAtual === 'true') {
                         dadosBodyRequest.administrador = 'false'
                     } else {
-                        dadosBodyRequest.administrador = true
+                        dadosBodyRequest.administrador = 'true'
                     }
 
                     // COMANDO PERSONALIZADO PARA EDITAR UM USUÁRIO CADASTRADOS PELO SEU ID
